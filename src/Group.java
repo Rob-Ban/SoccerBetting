@@ -1,89 +1,89 @@
-import java.util.*;
+package com.robban.soccerBetting;
+
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 // https://www.dfb.de/vereinsmitarbeiter/abteilungsleiterin-fussball/artikel/turnierplaene-als-download-85/
 
 
 public class Group {
 
-    private class TeamRank extends Team implements Comparable<TeamRank> {
-        private int defaultRank;                        // to ensure that teams are always returned in the same order
-                                                        // even when they have not played yet
-
-        TeamRank(String name, int defaultRank) {
-            super(name);
-            this.defaultRank = defaultRank;
-        }
-
-        @Override
-        public int compareTo(TeamRank otherTeam) {
-            int delta = calculatePoints(otherTeam) - calculatePoints(this);
-            if(delta != 0) { return delta; }
-
-            delta = getDiffGoals(otherTeam) -  getDiffGoals(this);
-            if(delta != 0) { return delta; }
-
-            delta = getCountGoals(otherTeam) - getCountGoals(this);
-            if(delta != 0) { return delta; }
-
-            Match match = getMatch(otherTeam, this);
-            delta = match.getGoalsTeamA() - match.getGoalsTeamB();
-            if(delta != 0) { return delta; }
-
-            return this.defaultRank - otherTeam.defaultRank;
-        }
-    }
-
     private String name;
     private List<Match> matches = new ArrayList<>();
-    public List<TeamRank> teams = new ArrayList<>();
+    private List<Team> teamsDisplayOrder = new ArrayList<>();
 
-    Group(String name, ArrayList<Match> matches) {
+    public Group(String name, ArrayList<Match> matches) {
         this.name = name;
 
         for(Match match : matches) {
             this.matches.add(match);
-            if(!teams.stream().anyMatch(team -> team.equals(match.getTeamA()))) {
-                teams.add(new TeamRank(match.getTeamA().getName(), teams.size() ));
-            };
-            if(!teams.stream().anyMatch(team -> team.equals(match.getTeamB()))) {
-                teams.add(new TeamRank(match.getTeamB().getName(), teams.size() ));
-            };
         }
-    }
 
+        teamsDisplayOrder.add(matches.get(0).getTeamA());
+        teamsDisplayOrder.add(matches.get(0).getTeamB());
+        teamsDisplayOrder.add(matches.get(1).getTeamA());
+        teamsDisplayOrder.add(matches.get(1).getTeamB());
+    }
 
     public String toString() {
-        String out = "";
-        Collections.sort(teams);
-        for(Team team : teams) {
-            out += ", " + team.getName() ;
-        }
-        return out.substring(2);
+        return teamsDisplayOrder.stream()
+                                .map( team -> team.toString() )
+                                .collect( Collectors.joining( ", " ) );
     }
 
+    public List<Team> getTeamsRanked() {
+        return new ArrayList<Team>(teamsDisplayOrder.stream()
+                                .sorted(TeamInGroupComparator)
+                                .collect(Collectors.toList()));
+    }
 
+    public Comparator<Team> TeamInGroupComparator = new Comparator<Team>() {
+        public int compare(Team teamA, Team teamB) {
+            int delta = calculatePoints(teamB) - calculatePoints(teamA);
+            if(delta != 0) { return delta; }
+
+            delta = getDiffGoals(teamB) -  getDiffGoals(teamA);
+            if(delta != 0) { return delta; }
+
+            delta = getCountGoals(teamB) - getCountGoals(teamA);
+            if(delta != 0) { return delta; }
+
+            Match match = getMatch(teamB, teamA);
+            delta = match.getGoalsTeamA() - match.getGoalsTeamB();
+            if(delta != 0) { return delta; }
+
+            return teamsDisplayOrder.indexOf(teamB) - teamsDisplayOrder.indexOf(teamA);
+        }
+    };
+
+
+    public String getGroupOverview() {
+        return getOverview(teamsDisplayOrder);
+    }
+    public String getGroupOverviewRanked() {
+        return getOverview(getTeamsRanked());
+    }
+    private String getOverview(List<Team> teams) {
+        String out = String.format("%25sM   W   D   L   G   C   +/- P%n","");
+        for(Team team : teams) {
+            out += String.format("%20s\t%s%n", team.getName(), getAchievement(team));
+        }
+        return out;
+    }
     public String getAchievement(Team team) {
         //                      M    W    D    L    G    C  +/-    P
         return String.format("%2d  %2d  %2d  %2d  %2d  %2d  %2d  %2d",
-                            getCountMatchesPlayed(team),
-                            getCountMatchesWon(team),
-                            getCountMatchesDraw(team),
-                            getCountMatchesLost(team),
-                            getCountGoals(team),
-                            getCountCounterGoals(team),
-                            getDiffGoals(team),
-                            calculatePoints(team));
-    }
-
-    public String getGroupOverview() {
-        String out = String.format("%25sM   W   D   L   G   C   +/- P%n","");
-        Collections.sort(teams);
-        for(TeamRank teamRank : teams) {
-            out += String.format("%20s\t%s%n", teamRank.getName(), getAchievement(teamRank));
-        }
-        return out;
+                getCountMatchesPlayed(team),
+                getCountMatchesWon(team),
+                getCountMatchesDraw(team),
+                getCountMatchesLost(team),
+                getCountGoals(team),
+                getCountCounterGoals(team),
+                getDiffGoals(team),
+                calculatePoints(team));
     }
 
     public Match getMatch(int matchNumber) {
@@ -122,22 +122,10 @@ public class Group {
     public void playMatch(Team teamA, Team teamB, int goalTeamA, int goalTeamB) throws Exception {
 //        getMatch(teamA, teamB).play(teamA, goalTeamA, goalTeamB);
         List<Match> matches = this.matches.stream()
+                                    .filter(Match::hasOccured)
                                     .filter(match -> match.isPlaying(teamA) && match.isPlaying(teamB))
                                     .collect(Collectors.toList());
-        if(matches.size() > 1) {
-            throw new Exception("Internal Error: Duplicate matches in group " + this.name);
-        }
-        else if(matches.size() == 0) {
-            throw new NoSuchElementException("Illegal argument: These teams (" + teamA.getName() + " : " + teamB.getName() +
-                    ") do not play in group " + this.name);
-        }
-        else { // m.size = 1    so we got one match ... let's see whether it was played already
-            if (matches.get(0).hasOccured()) {
-                throw new IllegalArgumentException("Illegal argument: These teams (" + teamA.getName() + " : " + teamB.getName() +
-                        ")have already played in the group " + this.name);
-            }
-            matches.get(0).play(teamA, goalTeamA, goalTeamB);
-        }
+        matches.get(0).play(teamA, goalTeamA, goalTeamB);
     }
     public void playMatch(String teamNameA, String teamNameB, int goalTeamA, int goalTeamB) {
         getMatch(teamNameA, teamNameB).play(teamNameA, goalTeamA, goalTeamB);
