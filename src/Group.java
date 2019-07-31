@@ -95,12 +95,10 @@ public class Group {
     }
 
     public Match getMatch(Team teamA, Team teamB) {
-        for(Match match : this.matches) {
-            if(match.isPlaying(teamA) && match.isPlaying(teamB) ) {
-                return match;
-            }
-        }
-        return null;
+        return this.matches.stream()
+                           .filter(match -> match.isPlaying(teamA) && match.isPlaying(teamB))
+                           .findFirst()
+                           .orElse(null);
     }
     public Match getMatch(String teamA, String teamB) {
         return getMatch(new Team(teamA), new Team(teamB));
@@ -119,16 +117,15 @@ public class Group {
         }
     }
 
-    public void playMatch(Team teamA, Team teamB, int goalTeamA, int goalTeamB) throws Exception {
-//        getMatch(teamA, teamB).play(teamA, goalTeamA, goalTeamB);
-        List<Match> matches = this.matches.stream()
-                                    .filter(Match::hasOccured)
-                                    .filter(match -> match.isPlaying(teamA) && match.isPlaying(teamB))
-                                    .collect(Collectors.toList());
-        matches.get(0).play(teamA, goalTeamA, goalTeamB);
+    public void playMatch(Team teamA, Team teamB, int goalTeamA, int goalTeamB)  {
+        this.matches.stream()
+                    .filter(match -> !match.hasOccured())
+                    .filter(match -> match.isPlaying(teamA) && match.isPlaying(teamB))
+                    .collect(Collectors.toList())
+                    .get(0).play(teamA, goalTeamA, goalTeamB);
     }
-    public void playMatch(String teamNameA, String teamNameB, int goalTeamA, int goalTeamB) {
-        getMatch(teamNameA, teamNameB).play(teamNameA, goalTeamA, goalTeamB);
+    public void playMatch(String teamNameA, String teamNameB, int goalTeamA, int goalTeamB)  {
+        playMatch(new Team(teamNameA), new Team(teamNameB), goalTeamA, goalTeamB);
     }
 
     public int getCountMatchesPlayed() {
