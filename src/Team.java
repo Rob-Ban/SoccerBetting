@@ -17,7 +17,7 @@ public class Team {
     }
 
     public boolean equals(Team team) {
-        return equals(this.name);
+        return equals(team.getName());
     }
 
     public boolean equals(String name) {
