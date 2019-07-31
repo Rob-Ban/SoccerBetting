@@ -1,8 +1,10 @@
+package com.robban.soccerBetting;
+
 public class Team {
 
-    private String name;
+    final private String name;
 
-    Team (String name) {
+    public Team (String name) {
         this.name = name;
     }
 
@@ -10,8 +12,12 @@ public class Team {
         return name;
     }
 
+    public int hashCode(){
+        return (int) this.name.hashCode();
+    }
+
     public boolean equals(Team team) {
-        return this.name.equalsIgnoreCase(team.getName());
+        return equals(this.name);
     }
 
     public boolean equals(String name) {
@@ -21,5 +27,4 @@ public class Team {
     public String toString() {
         return name;
     }
-
 }
