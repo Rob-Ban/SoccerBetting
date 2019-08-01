@@ -14,7 +14,7 @@ public class Match {
     private String place;                       // Where should this game take place?
 
     private boolean hadTimeExtension = false;   // has the match got extra time?
-    private boolean hadPenalty = false;         // has the match got extra time?
+    private boolean hadPenalty = false;         // was the match decided by penalty?
 
     public Match(Team teamA, Team teamB) {
         this.teamA = teamA;
@@ -58,9 +58,9 @@ public class Match {
     public void play(String team, int goalsTeamA, int goalsTeamB) {
         play(new Team(team), goalsTeamA, goalsTeamB);
     }
-    public void play(Team team, int goalsTeamA, int goalsTeamB, boolean hasTimeExtension, boolean hadPenalty) {
+    public void play(Team team, int goalsTeamA, int goalsTeamB, boolean hadTimeExtension, boolean hadPenalty) {
         this.play(team, goalsTeamA, goalsTeamB);
-        this.hadTimeExtension = hasTimeExtension;
+        this.hadTimeExtension = hadTimeExtension;
         this.hadPenalty = hadPenalty;
     }
 
@@ -82,14 +82,14 @@ public class Match {
 
     public Team getWinner() {
         if (!this.hasOccured ) {
-            throw new IllegalArgumentException("IllegalArgument: This match must not end in a draw.");
+            throw new IllegalArgumentException("IllegalArgument: Match has not yet occured.");
         }
         if ( this.goalsTeamA == this.goalsTeamB ) { return null; }
         return this.goalsTeamA > this.goalsTeamB ? this.getTeamA() : this.getTeamB();
     }
     public Team getLooser() {
         if (!this.hasOccured ) {
-            throw new IllegalArgumentException("IllegalArgument: This match must not end in a draw.");
+            throw new IllegalArgumentException("IllegalArgument: Match has not yet occured.");
         }
         if ( this.goalsTeamA == this.goalsTeamB ) { return null; }
         return this.goalsTeamA < this.goalsTeamB ? this.getTeamA() : this.getTeamB();
