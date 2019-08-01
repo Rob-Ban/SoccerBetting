@@ -20,13 +20,9 @@ public class Team {
     @Override
     public boolean equals(Object object) {
         if (object instanceof Team) {
-            return this.name.equals(((Team) object).getName());
+            return this.name.equalsIgnoreCase(((Team) object).getName());
         }
         return false;
-    }
-
-    public boolean equals(String name) {
-        return this.name.equalsIgnoreCase(name);
     }
 
     @Override
