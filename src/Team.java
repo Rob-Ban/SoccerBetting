@@ -12,18 +12,24 @@ public class Team {
         return name;
     }
 
+    @Override
     public int hashCode(){
-        return (int) this.name.hashCode();
+        return (int) this.name.toLowerCase().hashCode();
     }
 
-    public boolean equals(Team team) {
-        return equals(team.getName());
+    @Override
+    public boolean equals(Object object) {
+        if (object instanceof Team) {
+            return this.name.equals(((Team) object).getName());
+        }
+        return false;
     }
 
     public boolean equals(String name) {
         return this.name.equalsIgnoreCase(name);
     }
 
+    @Override
     public String toString() {
         return name;
     }

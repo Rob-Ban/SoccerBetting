@@ -8,6 +8,9 @@ import java.util.stream.Collectors;
 
 // https://www.dfb.de/vereinsmitarbeiter/abteilungsleiterin-fussball/artikel/turnierplaene-als-download-85/
 
+/**
+ * Group ranks 2 or more teams into an order by playing matches against each other.
+ */
 
 public class Group {
 
@@ -20,14 +23,15 @@ public class Group {
 
         for(Match match : matches) {
             this.matches.add(match);
-        }
 
-        teamsDisplayOrder.add(matches.get(0).getTeamA());
-        teamsDisplayOrder.add(matches.get(0).getTeamB());
-        teamsDisplayOrder.add(matches.get(1).getTeamA());
-        teamsDisplayOrder.add(matches.get(1).getTeamB());
+            Team team = match.getTeamA();
+            if(!teamsDisplayOrder.contains(team)) { teamsDisplayOrder.add(team); }
+            team = match.getTeamB();
+            if(!teamsDisplayOrder.contains(team)) { teamsDisplayOrder.add(team); }
+        }
     }
 
+    @Override
     public String toString() {
         return teamsDisplayOrder.stream()
                                 .map( team -> team.toString() )

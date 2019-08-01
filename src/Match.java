@@ -1,3 +1,5 @@
+package com.robban.soccerBetting;
+
 import java.time.*;
 
 public class Match {
@@ -96,7 +98,7 @@ public class Match {
 
     @Override
     public String toString() {
-        return "Match{" + teamA.getName() + " - " + teamB.getName() + "   " + goalsTeamA + " : " + goalsTeamB + '}';
+        return "com.robban.soccerBetting.Match{" + teamA.getName() + " - " + teamB.getName() + "   " + goalsTeamA + " : " + goalsTeamB + '}';
     }
 
     public LocalDateTime getDateTime() {
