@@ -21,10 +21,6 @@ public class Match {
         this.teamB = teamB;
         this.isKnockOut = false;
     }
-    public Match(String teamACountry, String teamBCountry) {
-        this(new Team (teamACountry),
-             new Team (teamBCountry) );
-    }
 
     public Match(Team teamA, Team teamB, boolean isKnockOut) {
         this.teamA = teamA;
@@ -55,9 +51,7 @@ public class Match {
         }
         this.hasOccured = true;
     }
-    public void play(String team, int goalsTeamA, int goalsTeamB) {
-        play(new Team(team), goalsTeamA, goalsTeamB);
-    }
+
     public void play(Team team, int goalsTeamA, int goalsTeamB, boolean hadTimeExtension, boolean hadPenalty) {
         this.play(team, goalsTeamA, goalsTeamB);
         this.hadTimeExtension = hadTimeExtension;
@@ -75,9 +69,6 @@ public class Match {
 
     public boolean isPlaying(Team team) {
         return team.equals(this.teamA) || team.equals(this.teamB);
-    }
-    public boolean isPlaying(String team) {
-        return isPlaying(new Team(team));
     }
 
     public Team getWinner() {

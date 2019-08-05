@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
 
 public class Group {
 
-    private String name;
-    private List<Match> matches = new ArrayList<>();
-    private List<Team> teamsDisplayOrder = new ArrayList<>();
+    final private String name;
+    final private List<Match> matches = new ArrayList<>();
+    final private List<Team> teamsDisplayOrder = new ArrayList<>();
 
     public Group(String name, ArrayList<Match> matches) {
         this.name = name;
@@ -90,7 +90,7 @@ public class Group {
                 calculatePoints(team));
     }
 
-    public Match getMatch(int matchNumber) {
+    Match getMatch(int matchNumber) {
         if(matchNumber >= this.matches.size() ) {
             throw new IndexOutOfBoundsException("No match no. " + matchNumber +
                                                 ". There are only " + this.matches.size() + " in group " + this.name + ".");
@@ -104,20 +104,12 @@ public class Group {
                            .findFirst()
                            .orElse(null);
     }
-    public Match getMatch(String teamA, String teamB) {
-        return getMatch(new Team(teamA), new Team(teamB));
-    }
+
 
     public void playMatch(int index, Team team, int goalTeamA, int goalTeamB) {
         Match match = matches.get(index);
         if (match.isPlaying(team)) {
             match.play(team, goalTeamA, goalTeamB);
-        }
-    }
-    public void playMatch(int index, String teamName, int goalTeamA, int goalTeamB) {
-        Match match = matches.get(index);
-        if (match.isPlaying(teamName)) {
-            match.play(teamName, goalTeamA, goalTeamB);
         }
     }
 
@@ -128,64 +120,52 @@ public class Group {
                     .collect(Collectors.toList())
                     .get(0).play(teamA, goalTeamA, goalTeamB);
     }
-    public void playMatch(String teamNameA, String teamNameB, int goalTeamA, int goalTeamB)  {
-        playMatch(new Team(teamNameA), new Team(teamNameB), goalTeamA, goalTeamB);
-    }
 
-    public int getCountMatchesPlayed() {
+
+    int getCountMatchesPlayed() {
         return (int) this.matches.stream()
                 .filter(Match::hasOccured)
                 .count();
     }
 
-    public int calculatePoints(Team team) {
+    int calculatePoints(Team team) {
         return 3 * getCountMatchesWon(team) + 1 * getCountMatchesDraw(team);
     }
 
-    public int getCountMatchesPlayed(Team team) {
+    int getCountMatchesPlayed(Team team) {
         return (int) this.matches.stream()
                                 .filter(Match::hasOccured)
                                 .filter(match -> match.isPlaying(team))
                                 .count();
     }
-    public int getCountMatchesPlayed(String teamName) {
-        return getCountMatchesPlayed(new Team(teamName));
-    }
 
-    public int getCountMatchesWon(Team team) {
+
+    int getCountMatchesWon(Team team) {
         return (int) this.matches.stream()
                                 .filter(Match::hasOccured)
                                 .filter(match -> !match.isDraw())
                                 .filter(match -> team.equals(match.getWinner()))
                                 .count();
     }
-    public int getCountMatchesWon(String teamName) {
-        return getCountMatchesWon(new Team(teamName));
-    }
 
-    public int getCountMatchesLost(Team team) {
+
+    int getCountMatchesLost(Team team) {
         return (int) this.matches.stream()
                                 .filter(Match::hasOccured)
                                 .filter(match -> !match.isDraw())
                                 .filter(match -> team.equals(match.getLooser()))
                                 .count();
     }
-    public int getCountMatchesLost(String teamName) {
-        return getCountMatchesLost(new Team(teamName));
-    }
 
-    public int getCountMatchesDraw(Team team) {
+    int getCountMatchesDraw(Team team) {
         return (int) this.matches.stream()
                                 .filter(Match::hasOccured)
                                 .filter(Match::isDraw)
                                 .filter(match -> match.isPlaying(team))
                                 .count();
     }
-    public int getCountMatchesDraw(String teamName) {
-        return getCountMatchesDraw(new Team(teamName));
-    }
 
-    public int getCountGoals(Team team) {
+    int getCountGoals(Team team) {
         return (int) this.matches.stream()
                 .filter(Match::hasOccured)
                 .filter(match -> match.isPlaying(team))
@@ -193,7 +173,7 @@ public class Group {
                 .sum();
     }
 
-    public int getCountCounterGoals(Team team) {
+    int getCountCounterGoals(Team team) {
         return (int) this.matches.stream()
                 .filter(Match::hasOccured)
                 .filter(match -> match.isPlaying(team))
@@ -201,7 +181,7 @@ public class Group {
                 .sum();
     }
 
-    public int getDiffGoals(Team team) {
+    int getDiffGoals(Team team) {
         return getCountGoals(team) - getCountCounterGoals(team);
     }
 
