@@ -1,0 +1,28 @@
+# Default ignored files
+/workspace.xml
+
+# Compiled class file
+*.class
+
+#Log file
+*.log
+
+# Package files
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+#virtual machine crash logs, see http://www.java.com.en/dowload/help/error_hotspot.xml
+
+.idea
+
+.META-INF
+*.kotlin*
+
+*.iml
+*.mdb
+*.ldb
+/ressources/WM 2010 tipps.xls
